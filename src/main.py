@@ -8,5 +8,6 @@ if __name__ == "__main__":
 		print("\n")
 		utils.saludo()
 		#print("Test, prueba de GitHub y GitHub desktop")
+		print("Hola, así funciona GitHub")
 	except ImportError:
 		print("Error: Módulos no encontrados")
