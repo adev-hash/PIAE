@@ -11,7 +11,7 @@ Al final después de imprimir las gráficas y limpiar los datos para una nueva s
 
 ## Authors
 
-- [@octokatherine](https://www.github.com/octokatherine)
+- [@adrianhcavazos](https://github.com/adev-hash)
 
 
 ## API Reference
