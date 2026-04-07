@@ -47,7 +47,7 @@ Takes two numbers and returns the sum.
 
 This project is used by the following companies:
 
-- UANL - FCFM
+- UANL - FCFM / Proyecto Acádemico - No Oficial
 
 
 ## Appendix
