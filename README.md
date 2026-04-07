@@ -11,7 +11,9 @@ Al final después de imprimir las gráficas y limpiar los datos para una nueva s
 
 ## Authors
 
-- [@adrianhcavazos](https://github.com/adev-hash)
+- [adrianhcavazos@gmail.com](https://github.com/adev-hash)
+- [miguelito.guerra@hotmail.com](https://github.com/adev-hash)
+- [crakmike46@gmail.com](https://github.com/adev-hash)
 
 
 ## API Reference
@@ -45,8 +47,7 @@ Takes two numbers and returns the sum.
 
 This project is used by the following companies:
 
-- Company 1
-- Company 2
+- UANL - FCFM
 
 
 ## Appendix
