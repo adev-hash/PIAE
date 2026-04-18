@@ -15,6 +15,7 @@ Al final después de imprimir las gráficas y limpiar los datos para una nueva s
 - [miguelito.guerra@hotmail.com](https://github.com/adev-hash)
 - [crakmike46@gmail.com](https://github.com/adev-hash)
 - [karla.vencov@gmail.com](https://github.com/adev-hash)
+- [fernandaperez6764@gmail.com](https://github.com/adev-hash)
 
 
 ## API Reference
