@@ -1,22 +1,28 @@
+'''
+El módulo limpiador_datos se encarga de procesar los datos obtenidos del api_cliente, eliminando información innecesaria o inválida, validando los datos y estructurándolos en un formato más claro y útil para su posterior análisis
+Última modificación: 18/04/2026
+Autor: Fernanda Pérez
+''' 
 import re
+from datetime import datetime
 
 def extraer_datos(data):
     resultados = []
 
-    for item in data.get("list", []):
-        fecha_completa = item.get("dt_txt", "")
-        fecha = fecha_completa[:10]
+    # Solo datos de clima actual (/weather)
+    fecha = datetime.now().strftime("%Y-%m-%d")
+    temp = data.get("main", {}).get("temp", None)
+    clima = data.get("weather", [{}])[0].get("description", "")
 
-        temp = item.get("main", {}).get("temp", None)
-        clima = item.get("weather", [{}])[0].get("description", "")
-
-        resultados.append((fecha, temp, clima))
+    resultados.append((fecha, temp, clima))
 
     return resultados
 
+
 def validar_fecha(fecha):
-    patron = r"\d{4}-\d{2}-\d{2}"
+    patron = r"^\d{4}-\d{2}-\d{2}$"
     return re.match(patron, fecha)
+
 
 def limpiar_datos(datos):
     datos_limpios = []
@@ -28,7 +34,9 @@ def limpiar_datos(datos):
 
     return datos_limpios
 
+
 def eliminar_repetidos(datos):
+    # Realmente ya no habrá repetidos, pero se deja por consistencia
     vistos = set()
     resultado = []
 
@@ -38,6 +46,7 @@ def eliminar_repetidos(datos):
             resultado.append((fecha, temp, clima))
 
     return resultado
+
 
 def estructurar_datos(datos):
     estructura = {}
@@ -49,6 +58,7 @@ def estructurar_datos(datos):
         }
 
     return estructura
+
 
 def procesar_datos(data):
     datos = extraer_datos(data)
