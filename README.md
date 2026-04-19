@@ -59,4 +59,3 @@ Este patrón indica que:
 • \d{2}: representa dos dígitos para el día
 El uso de expresiones regulares permite asegurar que los datos procesados sean consistentes y válidos antes de ser analizados, evitando errores en etapas posteriores del sistema.
 Cabe destacar que las expresiones regulares solo se emplean en el módulo limpiador_datos.py, ya que es el encargado de validar y filtrar los datos. En los demás módulos no es necesario su uso, debido a que trabajan con información previamente validada.
-
