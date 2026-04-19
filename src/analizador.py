@@ -1,8 +1,8 @@
-'''
-El modulo analizador de datos se encarga de procesar la información climática obtenida del módulo de limpieza de datos y generar recomendaciones para eventos al aire libre.
-Última modificación: 19/04/2026
-Autor: Massimo Vazquez
-''' 
+
+#El modulo analizador de datos se encarga de procesar la información climática obtenida del módulo de limpieza de datos y generar recomendaciones para eventos al aire libre.
+#Última modificación: 19/04/2026
+#Autor: Massimo Vazquez
+
 
 
 def filtrar_datos_climaticos(diccionario_limpio):
