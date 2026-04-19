@@ -7,7 +7,6 @@ if __name__ == "__main__":
 		utils.barra_carga(2, "Cargando")
 		print("\n")
 		utils.saludo()
-		#print("Test, prueba de GitHub y GitHub desktop")
-		print("Hola, así funciona GitHub")
+		print("¡Bienvenido al programa de aplicación climática!")
 	except ImportError:
 		print("Error: Módulos no encontrados")
