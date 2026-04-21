@@ -1,0 +1,47 @@
+{
+  "coord": {
+    "lon": -100.3167,
+    "lat": 25.6667
+  },
+  "weather": [
+    {
+      "id": 501,
+      "main": "Rain",
+      "description": "moderate rain",
+      "icon": "10n"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 17.26,
+    "feels_like": 17.29,
+    "temp_min": 17.26,
+    "temp_max": 17.26,
+    "pressure": 1020,
+    "humidity": 86,
+    "sea_level": 1020,
+    "grnd_level": 921
+  },
+  "visibility": 7356,
+  "wind": {
+    "speed": 2.71,
+    "deg": 119,
+    "gust": 4.9
+  },
+  "rain": {
+    "1h": 2.67
+  },
+  "clouds": {
+    "all": 99
+  },
+  "dt": 1776735231,
+  "sys": {
+    "country": "MX",
+    "sunrise": 1776687213,
+    "sunset": 1776733581
+  },
+  "timezone": -21600,
+  "id": 3995465,
+  "name": "Monterrey",
+  "cod": 200
+}

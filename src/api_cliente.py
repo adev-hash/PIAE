@@ -12,10 +12,10 @@ dir_datos = "datos/"
 
 def dato_clima(ciudad):
     # Obtiene el clima de una ciudad. Primero revisa si ya esta guardado localmente
-    nombre_archivo = os.path.join(dir_datos, f"{ciudad}.json")
+    nombre_archivo = os.path.join(dir_datos), f"{ciudad}.json"
 
-    if os.path.exists(nombre_archivo):
-        with open(nombre_archivo, "r") as f:
+    if os.path.exists("nombre_archivo"):
+        with open("nombre_archivo", "r") as f:
             return json.load(f)
 
     url = (f"https://api.openweathermap.org/data/2.5/weather"
@@ -24,7 +24,7 @@ def dato_clima(ciudad):
     datos = respuesta.json()
 
     os.makedirs(dir_datos, exist_ok=True)
-    with open(nombre_archivo, "w") as f:
+    with open("nombre_archivo", "w") as f:
         json.dump(datos, f, indent=2)
 
     return datos

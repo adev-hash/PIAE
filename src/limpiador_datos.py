@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 
 #El módulo limpiador_datos se encarga de procesar los datos obtenidos del api_cliente, #eliminando información innecesaria o inválida, validando los datos y estructurándolos #en un formato más claro y útil para su posterior análisis
 #Última modificación: 18/04/2026
 #Autor: Fernanda Pérez
  
+=======
+'''
+El módulo limpiador_datos se encarga de procesar los datos obtenidos del api_cliente, eliminando información innecesaria o inválida, validando los datos y estructurándolos en un formato más claro y útil para su posterior análisis
+Última modificación: 18/04/2026
+Autor: Fernanda Pérez
+''' 
+>>>>>>> c50f84d617659d99f2581de13a6562189e60bf30
 import re
 from datetime import datetime
 
