@@ -1,7 +1,8 @@
-#Este archivo contiene el codigo que permite al usuario consultar la informacion que requiera del API
-#Ultima modificacion: 15-04-26
-#Por: Karla Ivana Cordova Ventura
-
+'''
+Este archivo contiene el codigo que permite al usuario consultar la informacion que requiera del API
+Ultima modificacion: 15-04-26
+Por: Karla Ivana Cordova Ventura
+'''
 import requests
 import json
 import os
@@ -44,3 +45,5 @@ def obtener_descripcion(ciudad):
 def obtener_viento(ciudad):
     datos = dato_clima(ciudad)
     return datos["wind"]["speed"]
+
+#print(obtener_temperatura("Monterrey"))
