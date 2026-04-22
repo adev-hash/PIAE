@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+# <<<<<<< HEAD
 
 #El modulo analizador de datos se encarga de procesar la información climática obtenida del módulo de limpieza de datos y generar recomendaciones para eventos al aire libre.
 #Última modificación: 19/04/2026
@@ -43,7 +43,6 @@ def recomendacion_de_evento(fecha,clima,temperatura):
         "temperatura": temperatura,
         "alerta": alerta, 
         "recomendacion": recomendacion}
-=======
 
 #El modulo analizador de datos se encarga de procesar la información climática obtenida del módulo de limpieza de datos y generar recomendaciones para eventos al aire libre.
 #Última modificación: 19/04/2026
@@ -88,4 +87,4 @@ def recomendacion_de_evento(fecha,clima,temperatura):
         "temperatura": temperatura,
         "alerta": alerta, 
         "recomendacion": recomendacion}
->>>>>>> c50f84d617659d99f2581de13a6562189e60bf30
+# >>>>>>> c50f84d617659d99f2581de13a6562189e60bf30

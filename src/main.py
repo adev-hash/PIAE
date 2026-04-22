@@ -6,7 +6,6 @@ try:
 	print("\n")
 	utils.saludo()
 
-<<<<<<< HEAD
 if __name__ == "__main__":
 	try:
 		print("Iniciando programa principal")
@@ -16,7 +15,7 @@ if __name__ == "__main__":
 		print("¡Bienvenido al programa de aplicación climática!")
 	except ImportError:
 		print("Error: Módulos no encontrados")
-=======
+
 except ImportError:
 	print("Error: Módulo utils no encontrado")
 
@@ -45,4 +44,3 @@ print(f"Descripción: {datos}")
 datos = api_cliente.obtener_viento(ciudad)
 
 print(f"Viento: {datos}")
->>>>>>> c50f84d617659d99f2581de13a6562189e60bf30

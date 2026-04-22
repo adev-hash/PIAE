@@ -44,5 +44,3 @@ def obtener_descripcion(ciudad):
 def obtener_viento(ciudad):
     datos = dato_clima(ciudad)
     return datos["wind"]["speed"]
-
-#print(obtener_temperatura("Monterrey"))
