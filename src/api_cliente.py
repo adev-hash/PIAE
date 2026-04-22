@@ -1,44 +1,49 @@
+'''
+Este archivo contiene el codigo que permite al usuario consultar la informacion que requiera del API
+Ultima modificacion: 15-04-26
+Por: Karla Ivana Cordova Ventura
+'''
+import requests
+import json
+import os
 
-#El modulo analizador de datos se encarga de procesar la información climática obtenida del módulo de limpieza de datos y generar recomendaciones para eventos al aire libre.
-#Última modificación: 19/04/2026
-#Autor: Massimo Vazquez
+key = "6d8d2d9eef71f7fd269939efa424e373"
+# dir_datos es el directorio donde estan los datos solicitados con anterioridad
+dir_datos = "datos/"
 
+def dato_clima(ciudad):
+    # Obtiene el clima de una ciudad. Primero revisa si ya esta guardado localmente
+    nombre_archivo = os.path.join(dir_datos), f"{ciudad}.json"
 
+    if os.path.exists("nombre_archivo"):
+        with open("nombre_archivo", "r") as f:
+            return json.load(f)
 
-def filtrar_datos_climaticos(diccionario_limpio):
+    url = (f"https://api.openweathermap.org/data/2.5/weather"
+           f"?q={ciudad}&units=metric&appid={key}")
+    respuesta = requests.get(url)
+    datos = respuesta.json()
 
-    if not diccionario_limpio:
-        return None, None, None
+    os.makedirs(dir_datos, exist_ok=True)
+    with open("nombre_archivo", "w") as f:
+        json.dump(datos, f, indent=2)
 
-    lista_fechas = list(diccionario_limpio.keys())
-    fecha = lista_fechas[0]
-    datos = diccionario_limpio[fecha]
-    temperatura = datos.get("temperatura")
-    clima = datos.get("clima")
+    return datos
 
-    return fecha, temperatura, clima
+def obtener_temperatura(ciudad):
+    datos = dato_clima(ciudad)
+    return datos["main"]["temp"]
 
-def recomendacion_de_evento(fecha,clima,temperatura):
+def obtener_humedad(ciudad):
+    datos = dato_clima(ciudad)
+    return datos["main"]["humidity"]
 
-    alerta = ""
-    recomendacion = ""
+def obtener_descripcion(ciudad):
+    datos = dato_clima(ciudad)
+    return datos["weather"][0]["description"]
 
-    if "rain" in clima or "lluvia" in clima or "storm" in clima:
-        alerta = "Alerta de clima adverso: Se esperan lluvias o tormentas."
-        recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar cubierto,lleva paraguas o impermeable."
-    elif temperatura >= 35 
-        alerta = "Alerta de clima extremo: Temperaturas muy altas."
-        recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar con aire acondicionado, mantente hidratado y evita la exposición prolongada al sol."
-    elif temperatura <= 5:
-        alerta = "Alerta de clima extremo: Temperaturas muy bajas."
-        recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar con calefacción, vístete con ropa abrigada y evita la exposición prolongada al frío."
-    elif temperatura >= 20 and temperatura < 35 and "clear" in clima:
-        recomendacion = "Recomendación: Aprovecha el buen clima para realizar el evento al aire libre condiciones ideales."
-    else:
-        recomendacion = "Recomendación: El clima es normal, puedes proceder con el evento sin mayores preocupaciones."
-    return {
-        "fecha": fecha,
-        "clima": clima,
-        "temperatura": temperatura,
-        "alerta": alerta, 
-        "recomendacion": recomendacion}
+def obtener_viento(ciudad):
+    datos = dato_clima(ciudad)
+    return datos["wind"]["speed"]
+
+#print(obtener_temperatura("Monterrey"))
