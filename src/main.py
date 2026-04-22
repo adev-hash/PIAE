@@ -6,16 +6,6 @@ try:
 	print("\n")
 	utils.saludo()
 
-if __name__ == "__main__":
-	try:
-		print("Iniciando programa principal")
-		utils.barra_carga(2, "Cargando")
-		print("\n")
-		utils.saludo()
-		print("¡Bienvenido al programa de aplicación climática!")
-	except ImportError:
-		print("Error: Módulos no encontrados")
-
 except ImportError:
 	print("Error: Módulo utils no encontrado")
 
