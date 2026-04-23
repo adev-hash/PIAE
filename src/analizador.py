@@ -26,7 +26,7 @@ def recomendacion_de_evento(fecha,clima,temperatura):
     if "rain" in clima or "lluvia" in clima or "storm" in clima:
         alerta = "Alerta de clima adverso: Se esperan lluvias o tormentas."
         recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar cubierto,lleva paraguas o impermeable."
-    elif temperatura >= 35 
+    elif temperatura >= 35: 
         alerta = "Alerta de clima extremo: Temperaturas muy altas."
         recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar con aire acondicionado, mantente hidratado y evita la exposición prolongada al sol."
     elif temperatura <= 5:

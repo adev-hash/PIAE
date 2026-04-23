@@ -21,11 +21,11 @@ except ImportError:
 
 #Temperatura
 datos = api_cliente.obtener_temperatura(ciudad)
-print(f"Temperatura: {datos}")
+print(f"Temperatura: {datos}° C")
 
 #Humedad
 datos = api_cliente.obtener_humedad(ciudad)
-print(f"Humedad: {datos}")
+print(f"Humedad: {datos}%")
 
 #Descripcion del clima
 datos = api_cliente.obtener_descripcion(ciudad)
@@ -33,4 +33,7 @@ print(f"Descripción: {datos}")
 
 #Cantidad de viento
 datos = api_cliente.obtener_viento(ciudad)
-print(f"Viento: {datos}")
+print(f"Velocidad del Viento: {datos} m/s")
+
+
+#print(f"Test: La ciudad en los archivos es ")
