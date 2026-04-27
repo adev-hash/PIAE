@@ -69,14 +69,14 @@ def estructurar_datos(datos):
 
 
 def procesar_datos(data):
-'''
-Ejecuta todo el proceso de limpieza y organización de datos
-Pasos:
-    1. Extrae datos del API
-    2. Limpia datos inválidos
-    3. Elimina duplicados
-    4. Estructura la información
-'''
+	'''
+	Ejecuta todo el proceso de limpieza y organización de datos
+	Pasos:
+    	   1. Extrae datos del API
+    	   2. Limpia datos inválidos
+    	   3. Elimina duplicados
+    	   4. Estructura la información
+	'''
     datos = extraer_datos(data)
     datos = limpiar_datos(datos)
     datos = eliminar_repetidos(datos)
