@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 
 #Extrae los datos relevantes del JSON obtenido del API 
-def extraer_datos(data): 
+def extraer_datos(datos): 
     resultados = []
 
     # Solo datos de clima actual (/weather)
@@ -28,9 +28,10 @@ def validar_fecha(fecha):
     return re.match(patron, fecha)
 
 
-#Verifica que la temperatura sea real y razonable
+#Verifica que la temperatura sea real y razon	able
 def limpiar_datos(datos):
     datos_limpios = []
+    print("datos en limpiador_datos.py:", type(datos))
 
     for fecha, temp, clima in datos:
         if validar_fecha(fecha) and temp is not None:
@@ -68,7 +69,7 @@ def estructurar_datos(datos):
     return estructura
 
 
-def procesar_datos(data):
+def procesar_datos(datos):
     '''
     Ejecuta todo el proceso de limpieza y organización de datos
     Pasos:
@@ -77,7 +78,7 @@ def procesar_datos(data):
     	3. Elimina duplicados
     	4. Estructura la información
     '''
-    datos = extraer_datos(data)
+    datos = extraer_datos(datos)
     datos = limpiar_datos(datos)
     datos = eliminar_repetidos(datos)
     datos = estructurar_datos(datos)

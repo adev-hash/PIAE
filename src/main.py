@@ -1,4 +1,4 @@
-import utils, api_cliente, limpiador_datos, analizador, graficas
+import utils, api_cliente, limpiador_datos as ld, analizador, graficas
 
 try:
 	print("Iniciando programa principal")
@@ -16,6 +16,7 @@ ciudad = input("Ingresa la ciudad a analizar: ")
 
 try:
 	datos = api_cliente.dato_clima(ciudad)
+	print("datos en main:", type(datos))
 except ImportError:
 	print("Módulo api_cliente no encontrado")
 
@@ -35,5 +36,10 @@ print(f"Descripción: {datos}")
 datos = api_cliente.obtener_viento(ciudad)
 print(f"Velocidad del Viento: {datos} m/s")
 
-
 #print(f"Test: La ciudad en los archivos es ")
+
+
+#Limpiar los datos
+print("datos en main antes de entrar a ")
+datos_limpios = ld.procesar_datos(datos)
+print(datos_limpios)
