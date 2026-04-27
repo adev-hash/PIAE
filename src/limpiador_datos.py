@@ -12,10 +12,10 @@ def extraer_datos(datos):
 
     # Solo datos de clima actual (/weather)
     fecha = datetime.now().strftime("%Y-%m-%d")
-    temp = data.get("main", {}).get("temp", None)
+    temp = datos.get("main", {}).get("temp", None)
     # Se obtiene la descripción del clima del primer elemento de la lista "weather"
 # [{}] evita errores si la lista viene vacía
-    clima = data.get("weather", [{}])[0].get("description", "")
+    clima = datos.get("weather", [{}])[0].get("description", "")
 
     resultados.append((fecha, temp, clima))
 
