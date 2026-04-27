@@ -29,10 +29,10 @@ def recomendacion_de_evento(fecha,clima,temperatura):
     elif temperatura >= 35: 
         alerta = "Alerta de clima extremo: Temperaturas muy altas."
         recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar con aire acondicionado, mantente hidratado y evita la exposición prolongada al sol."
-    elif temperatura <= 5:
+    elif temperatura <= 12:
         alerta = "Alerta de clima extremo: Temperaturas muy bajas."
         recomendacion = "Recomendación: Considera posponer el evento o trasladarlo a un lugar con calefacción, vístete con ropa abrigada y evita la exposición prolongada al frío."
-    elif temperatura >= 20 and temperatura < 35 and "clear" in clima:
+    elif temperatura >= 19 and temperatura < 35 and "clear" in clima:
         recomendacion = "Recomendación: Aprovecha el buen clima para realizar el evento al aire libre condiciones ideales."
     else:
         recomendacion = "Recomendación: El clima es normal, puedes proceder con el evento sin mayores preocupaciones."

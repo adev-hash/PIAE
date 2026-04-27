@@ -46,4 +46,29 @@ def obtener_viento(ciudad):
     datos = dato_clima(ciudad)
     return datos["wind"]["speed"]
 
+def obtener_forecast(ciudad):
+    try:
+        respuesta = requests.get(url)
+        datos = respuesta.json()
+    except Exception:
+        return {}
+ 
+    if datos.get("cod") != "200":
+        return {}
+ 
+    hoy = datetime.now().strftime("%Y-%m-%d")
+    puntos = {}
+ 
+    for entrada in datos.get("list", []):
+        # dt_txt tiene el formato "2026-04-27 09:00:00"
+        dt_txt = entrada.get("dt_txt", "")
+        if dt_txt.startswith(hoy):
+            hora = int(dt_txt[11:13])           # extrae la hora (0, 3, 6 … 21)
+            temp = entrada["main"]["temp"]
+            puntos[hora] = round(temp, 1)
+ 
+    return puntos
+
 #print(obtener_temperatura("Monterrey"))
+
+

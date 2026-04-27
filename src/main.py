@@ -43,3 +43,4 @@ print(f"Velocidad del Viento: {datos} m/s")
 print("datos en main antes de entrar a ")
 datos_limpios = ld.procesar_datos(datos)
 print(datos_limpios)
+
