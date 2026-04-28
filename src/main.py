@@ -45,7 +45,7 @@ datos_limpios = ld.procesar_datos(datos)
 print(datos_limpios)
 
 datos_crudos  = api_cliente.dato_clima(ciudad)
-datos_limpios = limpiador_datos.procesar_datos(datos_crudos)
+datos_limpios = id.procesar_datos(datos_crudos)
 fecha, temperatura, clima = analizador.filtrar_datos_climaticos(datos_limpios)
 resultado = analizador.recomendacion_de_evento(fecha, clima, temperatura)
 
