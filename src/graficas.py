@@ -1,206 +1,140 @@
 '''
-El módulo graficas recibe los datos ya procesados por analizador y api_cliente
-para generar una gráfica de línea y exportar la información a Excel.
-Se ejecuta al final de cada consulta en main.py.
-Última modificación: 27/04/2026
-Autor: Adrián Humberto Cavazos Leal
+Módulo: graficas.py
 '''
 
-
+import matplotlib
+# Configura Matplotlib para que no dependa de una interfaz gráfica (evita bloqueos)
+matplotlib.use('Agg') 
 import matplotlib.pyplot as plt
 import math
-import os
+from pathlib import Path
 from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
-# Carpeta de salida: siempre junto al script, independiente de desde dónde se ejecute
-_DIR_SALIDA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reportes")
-os.makedirs(_DIR_SALIDA, exist_ok=True)
-
-#Function
 
 def generar_reporte(resultado_analizador: dict, datos_api: dict, ciudad: str) -> None:
-    """
-    Genera la gráfica de línea y exporta a Excel después de cada consulta.
+    """Función principal con manejo de errores por etapa."""
+    try:
+        import api_cliente
+    except ImportError:
+        print("Error: No se encontró el módulo 'api_cliente'.")
+        return
 
-    Parámetros:
-        resultado_analizador : Dict de analizador.recomendacion_de_evento()
-                               Claves: 'fecha', 'temperatura', 'clima', 'alerta', 'recomendacion'
-        datos_api            : Dict completo de api_cliente.dato_clima()
-        ciudad               : Nombre de la ciudad ingresada por el usuario.
-    """
-    import api_cliente
-
-    fecha       = resultado_analizador.get("fecha", datetime.now().strftime("%Y-%m-%d"))
+    fecha = resultado_analizador.get("fecha", datetime.now().strftime("%Y-%m-%d"))
     temperatura = resultado_analizador.get("temperatura")
-    clima       = resultado_analizador.get("clima", "")
-    alerta      = resultado_analizador.get("alerta", "")
-    recomend    = resultado_analizador.get("recomendacion", "")
-    humedad     = datos_api.get("main", {}).get("humidity")
-    viento      = datos_api.get("wind", {}).get("speed")
+    clima = resultado_analizador.get("clima", "")
+    alerta = resultado_analizador.get("alerta", "")
+    recomend = resultado_analizador.get("recomendacion", "")
+    
+    humedad = datos_api.get("main", {}).get("humidity")
+    viento = datos_api.get("wind", {}).get("speed")
 
-    # Obtener puntos reales del forecast (cada 3 h) para el día actual
+    # Obtener puntos del forecast
     puntos_forecast = api_cliente.obtener_forecast(ciudad)
 
-    grafica_consulta(fecha, temperatura, clima, ciudad, puntos_forecast)
-    exportar_excel(fecha, temperatura, clima, humedad, viento, alerta, recomend, ciudad)
+    # Ejecución independiente para que un error no mate al otro
+    try:
+        grafica_consulta(fecha, temperatura, clima, ciudad, puntos_forecast)
+    except Exception as e:
+        print(f"Error generando gráfica: {e}")
 
+    try:
+        exportar_excel(fecha, temperatura, clima, humedad, viento, alerta, recomend, ciudad)
+    except Exception as e:
+        print(f"Error exportando Excel: {e}")
 
-# Curve
 
 def _interpolar_24h(puntos_reales: dict, temp_actual: float) -> list:
-    """
-    Genera una curva suave senoidal de 24 horas basada en la temperatura
-    actual de la API. Mínimo estimado ~5 am, máximo ~15 h.
-    No requiere librerías adicionales.
-    """
+    """Cálculo de curva senoidal de temperatura."""
     hora_actual = datetime.now().hour
     base = temp_actual - 4
-
     temps = [
         round(base + (temp_actual - base) * math.sin(math.pi * max(h - 5, 0) / 18), 1)
         if 5 <= h <= 23 else base
         for h in range(24)
     ]
-
-    # Asegura que la hora actual tenga el valor exacto de la API
     temps[hora_actual] = temp_actual
     return temps
 
 
-#Graphic
-
-def grafica_consulta(
-    fecha: str, temperatura: float, clima: str,
-    ciudad: str, puntos_forecast: dict
-) -> None:
-    """
-    Genera una gráfica de línea de 0 a 23 h con temperaturas reales
-    interpoladas del forecast. Los puntos que vienen directamente de la
-    API se marcan con un color diferente al resto.
-    """
+def grafica_consulta(fecha: str, temperatura: float, clima: str, ciudad: str, puntos_forecast: dict) -> None:
+    """Genera y guarda la gráfica sin bloquear la ejecución."""
     hora_actual = datetime.now().hour
-    horas       = list(range(24))
-    temps_24h   = _interpolar_24h(puntos_forecast, temperatura)
+    horas = list(range(24))
+    temps_24h = _interpolar_24h(puntos_forecast, temperatura)
 
     fig, ax = plt.subplots(figsize=(11, 5))
-
-    #Line
-    ax.plot(
-        horas, temps_24h,
-        color="#E8622A", linewidth=2.5,
-        zorder=2
-    )
+    
+    # Estética de la gráfica
+    ax.plot(horas, temps_24h, color="#E8622A", linewidth=2.5, zorder=2)
     ax.fill_between(horas, temps_24h, alpha=0.12, color="#E8622A")
 
-    #Hora actual
-    ax.scatter(
-        [hora_actual], [temperatura],
-        color="#C04010", s=100, zorder=5,
-        label=f"Ahora ({hora_actual}h): {temperatura}°C"
-    )
-    ax.annotate(
-        f"{temperatura}°C",
-        xy=(hora_actual, temperatura),
-        xytext=(0, 13), textcoords="offset points",
-        ha="center", fontsize=10, fontweight="bold", color="#C04010"
-    )
+    # Destacar punto actual
+    ax.scatter([hora_actual], [temperatura], color="#C04010", s=100, zorder=5)
+    ax.annotate(f"{temperatura}°C", xy=(hora_actual, temperatura), xytext=(0, 10),
+                textcoords="offset points", ha="center", fontweight="bold", color="#C04010")
 
-    ax.set_title(f"Temperatura del día — {ciudad} ({fecha})",
-                 fontsize=13, fontweight="bold", pad=14)
-    ax.set_xlabel("Hora del día", fontsize=11)
-    ax.set_ylabel("Temperatura (°C)", fontsize=11)
+    ax.set_title(f"Pronóstico Diario: {ciudad} ({fecha})", fontsize=13, fontweight="bold")
     ax.set_xticks(range(0, 24))
     ax.set_xticklabels([f"{h}h" for h in range(24)], rotation=45, fontsize=8)
-    ax.grid(axis="y", linestyle="--", alpha=0.45)
-    ax.spines[["top", "right"]].set_visible(False)
     ax.set_facecolor("#FAFAFA")
+    ax.grid(axis="y", linestyle="--", alpha=0.3)
 
-    plt.figtext(0.5, -0.02, f"Condición: {clima}",
-                ha="center", fontsize=9, color="#555555")
     plt.tight_layout()
 
-    nombre_img = os.path.join(_DIR_SALIDA, f"grafica_{ciudad.lower().replace(' ', '_')}_{fecha}.png")
-    plt.savefig(nombre_img, dpi=150, bbox_inches="tight")
-    plt.show()
-    print(f"Gráfica guardada: {nombre_img}")
+    # Guardado seguro con Path
+    nombre_limpio = ciudad.lower().replace(' ', '_')
+    ruta_img = _DIR_SALIDA / f"grafica_{nombre_limpio}_{fecha}.png"
+    
+    plt.savefig(ruta_img, dpi=150, bbox_inches="tight")
+    plt.close(fig)  # Libera la memoria RAM
+    print(f"Gráfica guardada en: {ruta_img.name}")
 
 
-#Exportar
-
-def exportar_excel(
-    fecha: str, temperatura: float, clima: str,
-    humedad, viento,
-    alerta: str, recomendacion: str,
-    ciudad: str
-) -> str:
-    """
-    Exporta los datos de la consulta actual a un archivo Excel con una sola hoja.
-    """
-    nombre_archivo = os.path.join(_DIR_SALIDA, f"clima_{ciudad.lower().replace(' ', '_')}_{fecha}.xlsx")
-
-    fuente_enc  = Font(name="Arial", bold=True, color="FFFFFF", size=11)
-    relleno_enc = PatternFill("solid", start_color="2D6A9F")
-    alineado_c  = Alignment(horizontal="center", vertical="center")
-    borde_enc   = Border(
-        bottom=Side(style="medium", color="1A4E7A"),
-        right=Side(style="thin",    color="1A4E7A")
-    )
-    relleno_par = PatternFill("solid", start_color="EAF2FB")
+def exportar_excel(fecha, temperatura, clima, humedad, viento, alerta, recomendacion, ciudad) -> str:
+    """Exportación profesional a Excel con openpyxl."""
+    nombre_limpio = ciudad.lower().replace(' ', '_')
+    ruta_excel = _DIR_SALIDA / f"clima_{nombre_limpio}_{fecha}.xlsx"
 
     wb = Workbook()
-
-    #Datos de hoja
     ws = wb.active
-    ws.title = "Datos Climáticos"
+    ws.title = "Reporte"
 
+    # Estilos básicos
+    fuente_h = Font(name="Arial", bold=True, color="FFFFFF")
+    relleno_h = PatternFill("solid", start_color="2D6A9F")
+    
+    # Encabezados
     ws.merge_cells("A1:B1")
-    ws["A1"].value     = f"Reporte Climático — {ciudad}"
-    ws["A1"].font      = Font(name="Arial", bold=True, size=13, color="1A3A5C")
-    ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
-    ws["A1"].fill      = PatternFill("solid", start_color="D6E8F7")
-    ws.row_dimensions[1].height = 28
+    ws["A1"] = f"REPORTE: {ciudad}"
+    ws["A1"].font = Font(bold=True, size=14)
+    
+    ws["A2"], ws["B2"] = "PARÁMETRO", "VALOR"
+    for cell in [ws["A2"], ws["B2"]]:
+        cell.font = fuente_h
+        cell.fill = relleno_h
+        cell.alignment = Alignment(horizontal="center")
 
-    for col, texto in enumerate(["Parámetro", "Valor"], start=1):
-        c = ws.cell(row=2, column=col, value=texto)
-        c.font = fuente_enc; c.fill = relleno_enc
-        c.alignment = alineado_c; c.border = borde_enc
-    ws.row_dimensions[2].height = 22
-
-    filas_datos = [
-        ("Fecha de consulta",          fecha),
-        ("Ciudad",                     ciudad),
-        ("Temperatura (°C)",           temperatura),
-        ("Condición climática",        clima),
-        ("Humedad (%)",                humedad if humedad is not None else "N/D"),
-        ("Velocidad del viento (m/s)", viento  if viento  is not None else "N/D"),
-        ("Alerta",                     alerta if alerta else "Sin alertas"),
-        ("Recomendación",              recomendacion),
+    # Datos
+    datos = [
+        ("Fecha", fecha),
+        ("Temperatura", f"{temperatura}°C"),
+        ("Condición", clima),
+        ("Humedad", f"{humedad}%"),
+        ("Viento", f"{viento} m/s"),
+        ("Alertas", alerta if alerta else "Ninguna"),
+        ("Recomendación", recomendacion)
     ]
 
-    for i, (param, valor) in enumerate(filas_datos):
-        fila = i + 3
-        ws.cell(fila, 1, param).font = Font(name="Arial", size=10, bold=True)
-        celda_val = ws.cell(fila, 2, valor)
-        celda_val.font      = Font(name="Arial", size=10)
-        celda_val.alignment = Alignment(wrap_text=True, vertical="top")
-        if i % 2 == 0:
-            ws.cell(fila, 1).fill = relleno_par
-            celda_val.fill        = relleno_par
-        ws.row_dimensions[fila].height = 18
+    for i, (k, v) in enumerate(datos, start=3):
+        ws.cell(row=i, column=1, value=k).font = Font(bold=True)
+        ws.cell(row=i, column=2, value=v).alignment = Alignment(wrap_text=True)
 
-    ws.row_dimensions[10].height = 45
-    ws.column_dimensions["A"].width = 30
-    ws.column_dimensions["B"].width = 55
+    ws.column_dimensions["A"].width = 20
+    ws.column_dimensions["B"].width = 50
 
-    # Nota de generación al pie
-    nota_fila = len(filas_datos) + 4
-    ws.cell(nota_fila, 1,
-            f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
-        Font(name="Arial", size=9, italic=True, color="888888")
-
-    wb.save(nombre_archivo)
-    print(f"Excel guardado: {nombre_archivo}")
-    return nombre_archivo
+    wb.save(str(ruta_excel))
+    print(f" Excel generado en: {ruta_excel.name}")
+    return str(ruta_excel)
  
