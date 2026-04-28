@@ -43,3 +43,14 @@ print(f"Velocidad del Viento: {viento} m/s")
 print("datos en main antes de entrar a ")
 datos_limpios = ld.procesar_datos(datos)
 print(datos_limpios)
+
+datos_crudos  = api_cliente.dato_clima(ciudad)
+datos_limpios = limpiador_datos.procesar_datos(datos_crudos)
+fecha, temperatura, clima = analizador.filtrar_datos_climaticos(datos_limpios)
+resultado = analizador.recomendacion_de_evento(fecha, clima, temperatura)
+
+if resultado["alerta"]:
+    print(f"\n{resultado['alerta']}")
+print(resultado["recomendacion"])
+
+graficas.generar_reporte(resultado, datos_crudos, ciudad)
