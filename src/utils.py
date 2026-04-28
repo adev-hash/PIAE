@@ -14,4 +14,4 @@ def barra_carga(d = 3, msg="Loading"): #Establecemos el diametro de la barra y m
 print ("\n") #Salto de linea al terminar la carga
 
 def saludo():
-	print("Welcome to Python Program")
+	print("¡Bienvenido a la aplicación climática!")
