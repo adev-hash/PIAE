@@ -3,8 +3,6 @@
 #Última modificación: 19/04/2026
 #Autor: Massimo Vazquez
 
-
-
 def filtrar_datos_climaticos(diccionario_limpio):
 
     if not diccionario_limpio:

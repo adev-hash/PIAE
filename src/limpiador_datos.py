@@ -31,7 +31,7 @@ def validar_fecha(fecha):
 #Verifica que la temperatura sea real y razon	able
 def limpiar_datos(datos):
     datos_limpios = []
-    print("datos en limpiador_datos.py:", type(datos))
+    #print("datos en limpiador_datos.py:", type(datos))
 
     for fecha, temp, clima in datos:
         if validar_fecha(fecha) and temp is not None:
