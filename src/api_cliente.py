@@ -6,6 +6,8 @@ Por: Karla Ivana Cordova Ventura
 import requests
 import json
 import os
+import datetime
+
 
 key = "6d8d2d9eef71f7fd269939efa424e373"
 # dir_datos es el directorio donde estan los datos solicitados con anterioridad
@@ -48,7 +50,7 @@ def obtener_viento(ciudad):
 
 def obtener_forecast(ciudad):
     try:
-        respuesta = requests.get(url)
+        respuesta = requests.get(respuesta)
         datos = respuesta.json()
     except Exception:
         return {}
