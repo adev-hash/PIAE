@@ -1,13 +1,12 @@
 '''
 Este archivo contiene el codigo que permite al usuario consultar la informacion que requiera del API
-Ultima modificacion: 15-04-26
+Ultima modificacion: 27/04/2026
 Por: Karla Ivana Cordova Ventura
 '''
 import requests
 import json
 import os
-import datetime
-
+from datetime import datetime
 
 key = "6d8d2d9eef71f7fd269939efa424e373"
 # dir_datos es el directorio donde estan los datos solicitados con anterioridad
@@ -15,10 +14,10 @@ dir_datos = "datos/"
 
 def dato_clima(ciudad):
     # Obtiene el clima de una ciudad. Primero revisa si ya esta guardado localmente
-    nombre_archivo = os.path.join(dir_datos, f"{ciudad}.json")
+    ruta_archivo = f"{dir_datos}{ciudad}.json"
 
-    if os.path.exists(nombre_archivo):
-        with open(nombre_archivo, "r") as f:
+    if os.path.exists(ruta_archivo):
+        with open(ruta_archivo, "r") as f:
             return json.load(f)
 
     url = (f"https://api.openweathermap.org/data/2.5/weather"
@@ -27,7 +26,7 @@ def dato_clima(ciudad):
     datos = respuesta.json()
 
     os.makedirs(dir_datos, exist_ok=True)
-    with open(f"{ciudad}.json", "w") as f:
+    with open(ruta_archivo, "w") as f:
         json.dump(datos, f, indent=2)
 
     return datos
@@ -49,8 +48,11 @@ def obtener_viento(ciudad):
     return datos["wind"]["speed"]
 
 def obtener_forecast(ciudad):
+  
+    url = f"https://api.openweathermap.org/data/2.5/forecast?q={ciudad}&units=metric&appid={key}"
+ 
     try:
-        respuesta = requests.get(respuesta)
+        respuesta = requests.get(url)
         datos = respuesta.json()
     except Exception:
         return {}
@@ -62,15 +64,10 @@ def obtener_forecast(ciudad):
     puntos = {}
  
     for entrada in datos.get("list", []):
-        # dt_txt tiene el formato "2026-04-27 09:00:00"
         dt_txt = entrada.get("dt_txt", "")
         if dt_txt.startswith(hoy):
-            hora = int(dt_txt[11:13])           # extrae la hora (0, 3, 6 … 21)
+            hora = int(dt_txt[11:13])
             temp = entrada["main"]["temp"]
             puntos[hora] = round(temp, 1)
  
     return puntos
-
-#print(obtener_temperatura("Monterrey"))
-
-
