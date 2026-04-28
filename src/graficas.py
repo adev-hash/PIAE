@@ -16,7 +16,7 @@ _DIR_SALIDA.mkdir(parents=True, exist_ok=True)
 def generar_reporte(resultado_analizador: dict, datos_api: dict, ciudad: str) -> None:
     # Punto de entrada: llamar desde main.py después de cada consulta
     import api_cliente
-    #print("Esto debe generar el reporte")
+    print("Esto debe generar el reporte")
 
     fecha       = resultado_analizador.get("fecha", datetime.now().strftime("%Y-%m-%d"))
     temperatura = resultado_analizador.get("temperatura")
