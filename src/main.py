@@ -16,7 +16,7 @@ ciudad = input("Ingresa la ciudad a analizar: ")
 
 try:
 	datos = api_cliente.dato_clima(ciudad)
-	print("datos en main:", type(datos))
+	#print("datos en main:", type(datos))
 except ImportError:
 	print("Módulo api_cliente no encontrado")
 
@@ -40,9 +40,10 @@ print(f"Velocidad del Viento: {viento} m/s")
 
 
 #Limpiar los datos
-print("datos en main antes de entrar a ")
+
+#print("datos en main antes de entrar a limpiador_datos", type(datos))
 datos_limpios = ld.procesar_datos(datos)
-print(datos_limpios)
+#print(datos_limpios)
 
 datos_crudos  = api_cliente.dato_clima(ciudad)
 datos_limpios = ld.procesar_datos(datos_crudos)
