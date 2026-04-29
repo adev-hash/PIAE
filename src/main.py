@@ -1,3 +1,9 @@
+'''
+El módulo main conecta y manda a llamar todos los otros modulos para que el programa cumpla con todas las funciones, le pide al usuario que ingrese el dato de la ciudad y le muestra mensajes al usuario.
+Última modificación: 28/04/2026
+Autor: Miguel Angel Guerra Peña
+''' 
+
 import utils, api_cliente, limpiador_datos as ld, analizador, graficas
 
 try:
