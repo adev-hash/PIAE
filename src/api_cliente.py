@@ -9,6 +9,10 @@ import os
 from datetime import datetime
 
 key = "6d8d2d9eef71f7fd269939efa424e373"
+
+#Esta es la key que usa la suscripción.
+key2 = "64e5e1c01b176ce25da569b8627e31a9"
+
 # dir_datos es el directorio donde estan los datos solicitados con anterioridad
 dir_datos = "datos/"
 
