@@ -8,31 +8,47 @@ import json
 import os
 from datetime import datetime
 
+lan = ""
+lon = ""
+
 key = "6d8d2d9eef71f7fd269939efa424e373"
 
 #Esta es la key que usa la suscripción.
+key2 = "64e5e1c01b176ce25da569b8627e31a9"
 
 # dir_datos es el directorio donde estan los datos solicitados con anterioridad
 dir_datos = "datos/"
 
 def dato_clima(ciudad):
     # Obtiene el clima de una ciudad. Primero revisa si ya esta guardado localmente
+    #print("entro a dato_clima en api_cliente")
     ruta_archivo = f"{dir_datos}{ciudad}.json"
-
+    
+    #print("Prueba antes del if")
     if os.path.exists(ruta_archivo):
         with open(ruta_archivo, "r") as f:
             return json.load(f)
 
-    url = (f"https://api.openweathermap.org/data/2.5/weather"
-           f"?q={ciudad}&units=metric&appid={key}")
-    respuesta = requests.get(url)
-    datos = respuesta.json()
+    #print("Test: Después del if")
+    url1 = (f"https://api.openweathermap.org/data/2.5/weather"
+           f"?q={ciudad}&units=metric&appid={key2}")
+    respuesta1 = requests.get(url1)
+    datos1 = respuesta1.json()
+    lat = datos1["coord"]["lat"]
+    lon = datos1["coord"]["lon"]
+
+    url2 = ""
+
+    #print("Prueba: ")
+    #print("lat: ", lat)
+    #print("lon: ", lon)
+
 
     os.makedirs(dir_datos, exist_ok=True)
     with open(ruta_archivo, "w") as f:
-        json.dump(datos, f, indent=2)
+        json.dump(datos1, f, indent=2)
 
-    return datos
+    return datos1
 
 def obtener_temperatura(ciudad):
     datos = dato_clima(ciudad)
@@ -52,7 +68,8 @@ def obtener_viento(ciudad):
 
 def obtener_forecast(ciudad):
   
-    url = f"https://api.openweathermap.org/data/2.5/forecast?q={ciudad}&units=metric&appid={key}"
+    #url = f"https://api.openweathermap.org/data/2.5/forecast?q={ciudad}&units=metric&appid={key}"
+    url = f"http://api.openweathermap.org/geo/3.0/direct?q={ciudad}&limit=1&appid=64e5e1c01b176ce25da569b8627e31a9"
  
     try:
         respuesta = requests.get(url)
