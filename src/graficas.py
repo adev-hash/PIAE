@@ -34,23 +34,23 @@ def _obtener_onecall(ciudad: str) -> dict:
         return {}
 
 def _procesar_onecall(datos_oc: dict) -> tuple:
-    # Retorna (temps_24h, temp_max, temp_min) con hora local de la ciudad
-    hourly     = datos_oc.get("hourly", [])
-    tz_offset  = datos_oc.get("timezone_offset", 0)
-    tz_ciudad  = timezone(timedelta(seconds=tz_offset))
-    hoy_local  = datetime.now(tz=tz_ciudad).date()
+    # Toma las primeras 24 entradas de hourly (ya vienen en orden desde hora actual)
+    # y las coloca en el slot correcto según la hora local de la ciudad
+    hourly    = datos_oc.get("hourly", [])[:24]
+    tz_offset = datos_oc.get("timezone_offset", 0)
+    tz_ciudad = timezone(timedelta(seconds=tz_offset))
 
     temps_24h = [None] * 24
     for entrada in hourly:
-        dt_local = datetime.fromtimestamp(entrada["dt"], tz=tz_ciudad)
-        if dt_local.date() == hoy_local:
-            temps_24h[dt_local.hour] = round(entrada["temp"], 1)
+        hora = datetime.fromtimestamp(entrada["dt"], tz=tz_ciudad).hour
+        if temps_24h[hora] is None:
+            temps_24h[hora] = round(entrada["temp"], 1)
 
-    # Interpolar huecos entre vecinos para evitar tramos lineales
+    # Rellenar huecos interpolando entre vecinos
     for h in range(24):
         if temps_24h[h] is None:
-            izq = next((temps_24h[h-i] for i in range(1, h+1)   if temps_24h[h-i] is not None), None)
-            der = next((temps_24h[h+i] for i in range(1, 24-h)  if temps_24h[h+i] is not None), None)
+            izq = next((temps_24h[h-i] for i in range(1, h+1)  if temps_24h[h-i] is not None), None)
+            der = next((temps_24h[h+i] for i in range(1, 24-h) if temps_24h[h+i] is not None), None)
             if   izq is not None and der is not None: temps_24h[h] = round((izq + der) / 2, 1)
             elif izq is not None:                     temps_24h[h] = izq
             elif der is not None:                     temps_24h[h] = der
@@ -126,7 +126,7 @@ def generar_reporte(resultado_analizador: dict, datos_api: dict, ciudad: str) ->
         grafica_comparativa(historial)
 
 
-#Curva
+#Fallback senoidal
 
 def _curva_senoidal(temp_actual: float) -> list:
     hora_actual = datetime.now().hour
@@ -140,7 +140,7 @@ def _curva_senoidal(temp_actual: float) -> list:
     return temps
 
 
-#Grafica
+#Gráfica 1: temperatura del día
 
 def grafica_consulta(
     fecha: str, clima: str, ciudad: str,
@@ -179,7 +179,8 @@ def grafica_consulta(
     print(f"Gráfica guardada: {nombre_img}")
 
 
-#Grafica
+#Gráfica 2:
+
 def grafica_comparativa(historial: list) -> None:
     ciudades = [r["ciudad"] for r in historial]
     maximas  = [r["maxima"] for r in historial]
@@ -282,7 +283,7 @@ def exportar_excel(
             f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
         Font(name="Arial", size=9, italic=True, color="888888")
 
-    #Hoja 2 
+    #Hoja 2
     if len(historial) > 1:
         ws2 = wb.create_sheet("Comparativa")
 
@@ -311,7 +312,7 @@ def exportar_excel(
         for col, ancho in zip("ABCD", [20, 18, 18, 18]):
             ws2.column_dimensions[col].width = ancho
         ws2.cell(len(historial) + 4, 1,
-                 f"Reporte creado en: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
+                 f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
             Font(name="Arial", size=9, italic=True, color="888888")
 
     wb.save(nombre_archivo)
