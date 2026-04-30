@@ -311,7 +311,7 @@ def exportar_excel(
         for col, ancho in zip("ABCD", [20, 18, 18, 18]):
             ws2.column_dimensions[col].width = ancho
         ws2.cell(len(historial) + 4, 1,
-                 f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
+                 f"Reporte creado en: {datetime.now().strftime('%d/%m/%Y %H:%M')}").font = \
             Font(name="Arial", size=9, italic=True, color="888888")
 
     wb.save(nombre_archivo)
