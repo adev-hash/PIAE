@@ -19,7 +19,10 @@ if not api_cliente.verificar_conexion():
     print("Error: No hay conexión a internet. Verifica tu red e intenta de nuevo.")
     exit()
 
-ciudad = input("Ingresa la ciudad a analizar: ")
+ciudad = input("Ingresa la ciudad a analizar: ").strip()
+if not ciudad:
+    print("Error: No ingresaste ninguna ciudad. Intenta de nuevo.")
+    exit()
 
 # Validar que la ciudad existe antes de continuar
 datos = api_cliente.dato_clima(ciudad)
