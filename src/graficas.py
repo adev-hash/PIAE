@@ -11,8 +11,8 @@ from datetime import datetime, timezone, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
-_DIR_SALIDA     = Path(__file__).resolve().parent / "reportes"
-_HISTORIAL_JSON = Path(__file__).resolve().parent / "historial_comparativa.json"
+_DIR_SALIDA     = Path(__file__).resolve().parent.parent / "reportes"
+_HISTORIAL_JSON = Path(__file__).resolve().parent.parent / "historial_comparativa.json"
 _MAX_CIUDADES   = 4
 _KEY_GRAFICAS   = "64e5e1c01b176ce25da569b8627e31a9"
 
@@ -29,35 +29,28 @@ def _obtener_onecall(ciudad: str) -> dict:
         url = (f"https://api.openweathermap.org/data/3.0/onecall"
                f"?lat={lat}&lon={lon}&units=metric&exclude=minutely,alerts"
                f"&appid={_KEY_GRAFICAS}")
-        return requests.get(url).json()
+        datos = requests.get(url).json()
+        datos["_lat"] = lat
+        datos["_lon"] = lon
+        return datos
     except Exception:
         return {}
 
 def _procesar_onecall(datos_oc: dict) -> tuple:
-    # Toma las primeras 24 entradas de hourly (ya vienen en orden desde hora actual)
-    # y las coloca en el slot correcto según la hora local de la ciudad
+    # Toma las 24 entradas en orden cronológico desde la hora actual
+    # Índice 0 = ahora, índice 1 = ahora+1h, ..., índice 23 = ahora+23h
     hourly    = datos_oc.get("hourly", [])[:24]
     tz_offset = datos_oc.get("timezone_offset", 0)
-    tz_ciudad = timezone(timedelta(seconds=tz_offset))
 
-    temps_24h = [None] * 24
-    for entrada in hourly:
-        hora = datetime.fromtimestamp(entrada["dt"], tz=tz_ciudad).hour
-        if temps_24h[hora] is None:
-            temps_24h[hora] = round(entrada["temp"], 1)
+    temps_24h = [round(e["temp"], 1) for e in hourly]
 
-    # Rellenar huecos interpolando entre vecinos
-    for h in range(24):
-        if temps_24h[h] is None:
-            izq = next((temps_24h[h-i] for i in range(1, h+1)  if temps_24h[h-i] is not None), None)
-            der = next((temps_24h[h+i] for i in range(1, 24-h) if temps_24h[h+i] is not None), None)
-            if   izq is not None and der is not None: temps_24h[h] = round((izq + der) / 2, 1)
-            elif izq is not None:                     temps_24h[h] = izq
-            elif der is not None:                     temps_24h[h] = der
+    # Rellenar si faltan entradas al final
+    while len(temps_24h) < 24:
+        temps_24h.append(temps_24h[-1] if temps_24h else 0.0)
 
-    daily    = datos_oc.get("daily", [{}])
-    temp_max = daily[0].get("temp", {}).get("max")
-    temp_min = daily[0].get("temp", {}).get("min")
+    # Máx, mín y media calculadas desde el mismo temps_24h que se grafica
+    temp_max = max(temps_24h)
+    temp_min = min(temps_24h)
 
     return temps_24h, temp_max, temp_min, tz_offset
 
@@ -112,15 +105,17 @@ def generar_reporte(resultado_analizador: dict, datos_api: dict, ciudad: str) ->
     temps_24h, t_max, t_min, tz_off  = _procesar_onecall(datos_oc)
 
     # Fallback senoidal si One Call no devuelve datos
-    if not any(t is not None for t in temps_24h):
+    if not datos_oc.get("hourly"):
         temperatura = resultado_analizador.get("temperatura")
         temps_24h   = _curva_senoidal(temperatura)
         t_max, t_min = None, None
 
     historial = _registrar_ciudad(ciudad, temps_24h, t_max, t_min)
 
+    lat = datos_oc.get('_lat', 'N/D')
+    lon = datos_oc.get('_lon', 'N/D')
     grafica_consulta(fecha, clima, ciudad, temps_24h, tz_off)
-    exportar_excel(fecha, clima, humedad, viento, alerta, recomend, ciudad, historial)
+    exportar_excel(fecha, clima, humedad, viento, alerta, recomend, ciudad, historial, lat, lon)
 
     if len(historial) > 1:
         grafica_comparativa(historial)
@@ -147,25 +142,26 @@ def grafica_consulta(
     temps_24h: list, tz_offset: int = 0
 ) -> None:
     tz_ciudad   = timezone(timedelta(seconds=tz_offset))
-    hora_actual = datetime.now(tz=tz_ciudad).hour
+    hora_inicio = datetime.now(tz=tz_ciudad).hour
     horas       = list(range(24))
 
     fig, ax = plt.subplots(figsize=(11, 5))
     ax.plot(horas, temps_24h, color="#E8622A", linewidth=2.5, zorder=2)
     ax.fill_between(horas, temps_24h, alpha=0.12, color="#E8622A")
 
-    temp_punto = temps_24h[hora_actual]
-    ax.scatter([hora_actual], [temp_punto], color="#C04010", s=100, zorder=5)
+    temp_punto = temps_24h[0]
+    ax.scatter([0], [temp_punto], color="#C04010", s=100, zorder=5)
     ax.annotate(f"{temp_punto}°C",
-                xy=(hora_actual, temp_punto), xytext=(0, 13),
+                xy=(0, temp_punto), xytext=(0, 13),
                 textcoords="offset points", ha="center",
                 fontsize=10, fontweight="bold", color="#C04010")
 
     ax.set_title(f"Temperatura del día — {ciudad} ({fecha})", fontsize=13, fontweight="bold", pad=14)
     ax.set_xlabel("Hora del día", fontsize=11)
     ax.set_ylabel("Temperatura (°C)", fontsize=11)
+    etiquetas   = [f"{(hora_inicio + i) % 24}h" for i in range(24)]
     ax.set_xticks(range(24))
-    ax.set_xticklabels([f"{h}h" for h in range(24)], rotation=45, fontsize=8)
+    ax.set_xticklabels(etiquetas, rotation=45, fontsize=8)
     ax.grid(axis="y", linestyle="--", alpha=0.45)
     ax.spines[["top", "right"]].set_visible(False)
     ax.set_facecolor("#FAFAFA")
@@ -218,7 +214,8 @@ def grafica_comparativa(historial: list) -> None:
 
 def exportar_excel(
     fecha: str, clima: str, humedad, viento,
-    alerta: str, recomendacion: str, ciudad: str, historial: list
+    alerta: str, recomendacion: str, ciudad: str, historial: list,
+    lat=None, lon=None
 ) -> str:
     nombre_archivo = _DIR_SALIDA / f"clima_{ciudad.lower().replace(' ', '_')}_{fecha}.xlsx"
 
@@ -259,6 +256,8 @@ def exportar_excel(
         ("Temperatura máxima (°C)",    temp_max),
         ("Temperatura media (°C)",     temp_med),
         ("Temperatura mínima (°C)",    temp_min),
+        ("Latitud",                    lat if lat is not None else "N/D"),
+        ("Longitud",                   lon if lon is not None else "N/D"),
         ("Condición climática",        clima),
         ("Humedad (%)",                humedad if humedad is not None else "N/D"),
         ("Velocidad del viento (m/s)", viento  if viento  is not None else "N/D"),
