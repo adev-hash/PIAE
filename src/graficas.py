@@ -1,5 +1,5 @@
 # Módulo de gráficas y exportación a Excel.
-# Última modificación: 29/04/2026
+# Última modificación: 30/04/2026
 # Autor: Adrián Humberto Cavazos Leal
 
 import matplotlib.pyplot as plt
